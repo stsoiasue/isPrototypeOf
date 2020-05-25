@@ -1,0 +1,117 @@
+<script src='simpletest.js'></script>
+<script>
+	
+	// Parameters
+		// prototypeObj: prototype object to search for
+		// searchObj: object who's prototype chain will be searched
+
+	// return value
+		// A Boolean indicating whether the calling object lies in the prototype chain of the specified object.
+		
+		// tests:
+		// If the prototypeObj is the prototype of searchObj it should return true
+		// If the prototypeObj is in searchObj's prototype chain it should return true
+		// If the prototypeObj is not in the searchObj's prototype chain, it should return false
+		// If the prototypeObj is undefined or null it should throw a TypeError
+		
+	function isPrototypeof(prototypeObj, searchObj) {
+		if (!Boolean(prototypeObj)) {
+			throw new TypeError('prototypeObj cannot be null or undefined');
+		}
+
+		var searchObjPrototype = Object.getPrototypeOf(searchObj);
+		
+		// base case 1: prototype of searchObj is prototypeObj
+		if (searchObjPrototype === prototypeObj) {
+			return true;
+		}
+		
+		// base case 2: prototype of searchObj is null
+		if (searchObjPrototype === null) {
+			return false;
+		}
+		
+		// recursive case: prototype of searchObj != to prototypeObj and has a prototype
+		return isPrototypeof(prototypeObj, searchObjPrototype);
+	}
+		
+	tests({
+		"If the prototypeObj is the prototype of searchObj it should return true": function() {
+			var canine = {
+				bark: function() {
+					console.log('bark');
+				}
+			};
+
+			var dog = Object.create(canine);
+			dog.fetch = function() {
+				console.log('fetch');
+			};
+
+			var myDog = Object.create(dog);
+
+			eq(isPrototypeof(dog, myDog), 1);
+		},
+
+		"If the prototypeObj is in searchObj's prototype chain it should return true": function() {
+			var canine = {
+				bark: function() {
+					console.log('bark');
+				}
+			};
+
+			var dog = Object.create(canine);
+			dog.fetch = function() {
+				console.log('fetch');
+			};
+
+			var myDog = Object.create(dog);
+
+			eq(isPrototypeof(canine, myDog), 1);
+			eq(isPrototypeof(Object.prototype, myDog), 1);
+		},
+
+		"If the prototypeObj is not in the searchObj's prototype chain, it should return false": function() {
+			var canine = {
+				bark: function() {
+					console.log('bark');
+				}
+			};
+
+			var dog = Object.create(canine);
+			dog.fetch = function() {
+				console.log('fetch');
+			};
+
+			var myDog = Object.create(dog);
+			var empty = Object.create(null);
+
+			eq(isPrototypeof(dog, empty), 0);
+		},
+		
+		"If the prototypeObj is undefined or null it should throw a TypeError": function() {
+			var canine = {
+				bark: function() {
+					console.log('bark');
+				}
+			};
+
+			var dog = Object.create(canine);
+			dog.fetch = function() {
+				console.log('fetch');
+			};
+
+			var myDog = Object.create(dog);
+			var empty = Object.create(null);
+
+			try {
+				isPrototypeof(null, myDog)
+			} catch (e) {
+				var isError = (e instanceof TypeError);
+			}
+
+			eq(isError, true);
+		}
+	});
+	
+</script>
